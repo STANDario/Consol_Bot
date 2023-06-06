@@ -5,6 +5,11 @@ number_dict = {
     "Valeriya": "380934267600"
 }
 
+CYCLE = True
+
+list_command = ("show all", "good bye")
+list_user_input = []
+
 
 def input_error(func):
     def inner():
@@ -17,7 +22,7 @@ def input_error(func):
                     raise KeyError
             except:
                 return "Give me name and phone please"
-        
+
         elif list_user_input[0] == "phone":
             try:
                 if list_user_input[1].isalpha():
@@ -62,8 +67,8 @@ def show_all():
 
 @input_error
 def exit():
-    global x
-    x = False
+    global CYCLE
+    CYCLE = False
     return "Good bye!"
 
 
@@ -77,7 +82,7 @@ operations = {
     "close": exit,
     "exit": exit
 }
-     
+
 
 def get_handler(operator):
     try:
@@ -113,11 +118,6 @@ def main():
                 print(result_print)
 
 
-list_command = ["show all", "good bye"]
-list_user_input = []
-x = True
-
 if __name__ == "__main__":
-    while x:
+    while CYCLE:
         main()
-
