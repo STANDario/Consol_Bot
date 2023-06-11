@@ -1,9 +1,57 @@
-number_dict = {
+from collections import UserDict
+
+
+class AddressBook(UserDict):
+    def add_record(self, key, value):
+        self.data[key] = value
+
+
+class Field:
+    pass
+
+
+class Name:
+    def __init__(self, value):
+        self.value = value
+
+    def get_value(self):
+        return self.value
+    
+
+class Phone:
+    def __init__(self, phone):
+        self.phone = phone
+    
+    def get_phone(self):
+        return self.phone
+    
+
+class Record:
+
+    dict_record = {}
+
+    def __init__(self, name, phone):
+        self.name = name
+        self._name = name.get_value()
+        self.phone = phone
+        self._phone = phone.get_phone()
+
+    def add_change(self):
+        return self._phone
+
+    def delete(self):
+        self.dict_record[self._name] = []
+
+    def add_to_dict(self):
+        return self.dict_record
+
+
+number_dict = AddressBook({
     "Andrii": "380671125330",
     "Oksana": "380675069283",
     "Oleksandr": "380677384098",
     "Valeriya": "380934267600"
-}
+})
 
 CYCLE = True
 
@@ -16,12 +64,12 @@ def input_error(func):
 
         if list_user_input[0] == "add" or list_user_input[0] == "change":
             try:
-                if list_user_input[1].isalpha() and list_user_input[2].isnumeric():
+                if list_user_input[1].isalpha():
                     return func()
                 else:
                     raise KeyError
             except:
-                return "Give me name and phone please"
+                return "Give me first - name, then give another info please"
 
         elif list_user_input[0] == "phone":
             try:
@@ -31,6 +79,15 @@ def input_error(func):
                     raise KeyError
             except:
                 return "Enter user name"
+        
+        elif list_user_input[0] == "delete":
+            try:
+                if list_user_input[1].isalpha() and list_user_input[1] in number_dict:
+                    return func()
+                else:
+                    raise KeyError
+            except:
+                return "Enter user name you want to delete, this user name isn`t in the address book"
 
         else:
             return func()
@@ -45,9 +102,8 @@ def hello():
 
 @input_error
 def add_change():
-    name = list_user_input[1]
-    phone_num = list_user_input[2]
-    number_dict[name] = phone_num
+    record = Record(Name(list_user_input[1]), Phone(list_user_input[2:]))
+    number_dict.add_record(record.name.value, record.add_change())
 
 
 @input_error
@@ -72,6 +128,13 @@ def exit():
     return "Good bye!"
 
 
+@input_error
+def delete():
+    record = Record(Name(list_user_input[1]), Phone(list_user_input[2:]))
+    record.delete()
+    number_dict.add_record(record.name.value, record.add_change())
+
+
 operations = {
     "hello": hello,
     "add": add_change,
@@ -80,7 +143,8 @@ operations = {
     "show all": show_all,
     "good bye": exit,
     "close": exit,
-    "exit": exit
+    "exit": exit,
+    "delete": delete
 }
 
 
