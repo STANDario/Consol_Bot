@@ -14,17 +14,11 @@ class Name:
     def __init__(self, value):
         self.value = value
 
-    def get_value(self):
-        return self.value
-    
 
 class Phone:
-    def __init__(self, phone):
-        self.phone = phone
-    
-    def get_phone(self):
-        return self.phone
-    
+    def __init__(self, value):
+        self.value = value
+
 
 class Record:
 
@@ -32,15 +26,13 @@ class Record:
 
     def __init__(self, name, phone):
         self.name = name
-        self._name = name.get_value()
         self.phone = phone
-        self._phone = phone.get_phone()
 
     def add_change(self):
-        return self._phone
+        return self.phone
 
     def delete(self):
-        self.dict_record[self._name] = []
+        self.dict_record[self.name.value] = []
 
     def add_to_dict(self):
         return self.dict_record
@@ -64,7 +56,7 @@ def input_error(func):
 
         if list_user_input[0] == "add" or list_user_input[0] == "change":
             try:
-                if list_user_input[1].isalpha():
+                if list_user_input[1].isalpha() and len(list_user_input) > 2:
                     return func()
                 else:
                     raise KeyError
@@ -79,10 +71,10 @@ def input_error(func):
                     raise KeyError
             except:
                 return "Enter user name"
-        
+
         elif list_user_input[0] == "delete":
             try:
-                if list_user_input[1].isalpha() and list_user_input[1] in number_dict:
+                if list_user_input[1].isalpha() and list_user_input[1] in number_dict and len(list_user_input) == 2:
                     return func()
                 else:
                     raise KeyError
@@ -102,7 +94,11 @@ def hello():
 
 @input_error
 def add_change():
-    record = Record(Name(list_user_input[1]), Phone(list_user_input[2:]))
+    phones = []
+    for phone in list_user_input[2:]:
+        phone = Phone(phone)
+        phones.append(phone.value)
+    record = Record(Name(list_user_input[1]), phones)
     number_dict.add_record(record.name.value, record.add_change())
 
 
