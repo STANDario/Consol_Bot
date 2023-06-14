@@ -22,9 +22,7 @@ class Phone:
 
 class Record:
 
-    dict_record = {}
-
-    def __init__(self, name, phone):
+    def __init__(self, name, phone=None):
         self.name = name
         self.phone = phone
 
@@ -32,10 +30,7 @@ class Record:
         return self.phone
 
     def delete(self):
-        self.dict_record[self.name.value] = []
-
-    def add_to_dict(self):
-        return self.dict_record
+        return []
 
 
 number_dict = AddressBook({
@@ -126,9 +121,8 @@ def exit():
 
 @input_error
 def delete():
-    record = Record(Name(list_user_input[1]), Phone(list_user_input[2:]))
-    record.delete()
-    number_dict.add_record(record.name.value, record.add_change())
+    record = Record(Name(list_user_input[1]))
+    number_dict.add_record(record.name.value, record.delete())
 
 
 operations = {
