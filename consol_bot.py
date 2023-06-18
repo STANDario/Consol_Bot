@@ -3,8 +3,25 @@ from datetime import datetime
 
 
 class AddressBook(UserDict):
+    def __init__(self, data):
+        self.count = -1
+        self.list_keys = []
+        self.data = data
+        for k in self.data.keys():
+            self.list_keys.append(k)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.count + 1 >= len(self.list_keys):
+            raise StopIteration
+        self.count += 1
+        return self.list_keys[self.count], self.data[self.list_keys[self.count]]
+
     def add_record(self, key, value):
         self.data[key] = value
+        self.list_keys.append(key)
 
 
 class Field:
@@ -81,7 +98,7 @@ def input_error(func):
                 if list_user_input[1].isalpha() and len(list_user_input) >= 2:
                     date_check = list_user_input[-1].split(".")
                     if len(list_user_input[-1]) == 10 and len(date_check) == 3:
-                        if len(date_check[0]) == 4 and 0 < int(date_check[1]) <= 12 and int(date_check[2]) > 0:
+                        if int(date_check[0]) < datetime.now().year and 0 < int(date_check[1]) <= 12 and int(date_check[2]) > 0:
                             birthday = list_user_input[-1]
                         else:
                             raise KeyError
@@ -111,7 +128,15 @@ def input_error(func):
             except:
                 return "Enter user name you want to delete, this user name isn`t in the address book"
 
-        else:
+        elif list_user_input[0] == "show":
+            try:
+                if int(list_user_input[1]) <= len(number_dict) and int(list_user_input[1]) > 0:
+                    return func()
+                raise KeyError
+            except:
+                return "You don`t have as many contacts as you printed!"
+
+        elif list_user_input[0] == "show all":
             return func()
 
     return inner
@@ -148,10 +173,24 @@ def phone():
 
 @input_error
 def show_all():
+    global number_dict
     res_show_all = ("")
-    for k, v in number_dict.items():
+    for k, v in number_dict:
         res_show_all += f"{k}: {v}\n"
     res_show_all = res_show_all.strip()
+    number_dict = AddressBook(number_dict.data)
+    return res_show_all
+
+
+@input_error  # За допомогою цієї команди виводимо стільки контактів скільки хочемо. Треба писати, як приклад "show 3", тоді виведе 3 контакти
+def show():
+    global number_dict
+    res_show_all = ("")
+    for _ in range(int(list_user_input[1])):
+        x = next(number_dict)
+        res_show_all += f"{str(x)}\n"
+    res_show_all = res_show_all.strip()
+    number_dict = AddressBook(number_dict.data)
     return res_show_all
 
 
@@ -174,6 +213,7 @@ operations = {
     "change": add_change,
     "phone": phone,
     "show all": show_all,
+    "show": show,
     "good bye": exit,
     "close": exit,
     "exit": exit,
