@@ -1,4 +1,5 @@
 from collections import UserDict
+from datetime import datetime
 
 
 class AddressBook(UserDict):
@@ -20,17 +21,43 @@ class Phone:
         self.value = value
 
 
+class Birthday:
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return self.value
+
+
 class Record:
 
-    def __init__(self, name, phone=None):
+    def __init__(self, name, phone=None, birthday=""):
         self.name = name
         self.phone = phone
+        self.birthday = str(birthday)
 
     def add_change(self):
-        return self.phone
+        if self.birthday:
+            return self.phone, self.days_to_birthday()
+        else:
+            return self.phone
 
     def delete(self):
         return []
+
+    def days_to_birthday(self):
+        self.birthday = self.birthday.split(".")
+        self.birthday = datetime(int(self.birthday[0]), int(
+            self.birthday[1]), int(self.birthday[2]))
+        date_now = datetime.now().date()
+        self.birthday = self.birthday.replace(year=date_now.year)
+
+        if self.birthday.date() > date_now:
+            return f"days to birthday: {(self.birthday.date() - date_now).days}"
+        elif self.birthday.date() == date_now:
+            return "Today is birthday :)"
+        else:
+            return f"days to birthday: {((self.birthday.replace(year=date_now.year+1)).date() - date_now).days}"
 
 
 number_dict = AddressBook({
@@ -51,21 +78,29 @@ def input_error(func):
 
         if list_user_input[0] == "add" or list_user_input[0] == "change":
             try:
-                if list_user_input[1].isalpha() and len(list_user_input) > 2:
-                    return func()
+                if list_user_input[1].isalpha() and len(list_user_input) >= 2:
+                    date_check = list_user_input[-1].split(".")
+                    if len(list_user_input[-1]) == 10 and len(date_check) == 3:
+                        if len(date_check[0]) == 4 and 0 < int(date_check[1]) <= 12 and int(date_check[2]) > 0:
+                            birthday = list_user_input[-1]
+                        else:
+                            raise KeyError
+                    else:
+                        birthday = ""
+                    return func(birthday)
                 else:
                     raise KeyError
             except:
-                return "Give me first - name, then give another info please"
+                return "Give me first - name, then give another info please. In the end, if you want, give me date of birthday, like 'yyyy.mm.dd'!"
 
         elif list_user_input[0] == "phone":
             try:
-                if list_user_input[1].isalpha():
+                if list_user_input[1].isalpha() and list_user_input[1] in number_dict:
                     return func()
                 else:
                     raise KeyError
             except:
-                return "Enter user name"
+                return "Enter another user name. This user name isn`t in the address book"
 
         elif list_user_input[0] == "delete":
             try:
@@ -88,12 +123,20 @@ def hello():
 
 
 @input_error
-def add_change():
+def add_change(birthday):
     phones = []
-    for phone in list_user_input[2:]:
-        phone = Phone(phone)
-        phones.append(phone.value)
-    record = Record(Name(list_user_input[1]), phones)
+
+    if len(list_user_input) != 2:
+        for phone in list_user_input[2:-1]:
+            phone = Phone(phone)
+            phones.append(phone.value)
+
+        if not birthday:
+            phones.append(list_user_input[-1])
+    else:
+        pass
+
+    record = Record(Name(list_user_input[1]), phones, Birthday(birthday))
     number_dict.add_record(record.name.value, record.add_change())
 
 
