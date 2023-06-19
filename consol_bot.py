@@ -26,6 +26,22 @@ class AddressBook(UserDict):
 
 class Field:
     pass
+    # def __init__(self, phone=None, birthday=None):
+    #     self.__phone = None
+    #     self.__birthday = None
+    #     self.phone = phone
+    #     self.birthday = birthday
+
+    # @property
+    # def phone(self):
+    #     return self.__phone
+
+    # @phone.setter
+    # def phone(self, phone):
+    #     if phone[0].startswith("+"):
+    #         self.__phone = phone
+    #     else:
+    #         return ("Number must be started from '+'")
 
 
 class Name:
@@ -33,12 +49,14 @@ class Name:
         self.value = value
 
 
-class Phone:
+class Phone(Field):
+    # def __init__(self, value):
+    #     super().__init__(value)
     def __init__(self, value):
         self.value = value
 
 
-class Birthday:
+class Birthday(Field):
     def __init__(self, value):
         self.value = value
 
@@ -139,6 +157,9 @@ def input_error(func):
         elif list_user_input[0] == "show all":
             return func()
 
+        else:
+            return func()
+
     return inner
 
 
@@ -182,7 +203,7 @@ def show_all():
     return res_show_all
 
 
-@input_error  # За допомогою цієї команди виводимо стільки контактів скільки хочемо. Треба писати, як приклад "show 3", тоді виведе 3 контакти
+@input_error  # За допомогою цієї команди виводимо стільки контактів скільки хочемо. Треба писати, як приклад "show 3", тоді виведе перші 3 контакти
 def show():
     global number_dict
     res_show_all = ("")
@@ -203,8 +224,10 @@ def exit():
 
 @input_error
 def delete():
+    global number_dict
     record = Record(Name(list_user_input[1]))
     number_dict.add_record(record.name.value, record.delete())
+    number_dict = AddressBook(number_dict.data)
 
 
 operations = {
