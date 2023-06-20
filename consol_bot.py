@@ -25,23 +25,36 @@ class AddressBook(UserDict):
 
 
 class Field:
-    pass
-    # def __init__(self, phone=None, birthday=None):
-    #     self.__phone = None
-    #     self.__birthday = None
-    #     self.phone = phone
-    #     self.birthday = birthday
+    def __init__(self, phone=None, birthday=None):
+        self.__phone = None
+        self.__birthday = None
+        if phone:
+            self.phone = phone
+        if birthday:
+            self.birthday = birthday
 
-    # @property
-    # def phone(self):
-    #     return self.__phone
+    @property
+    def phone(self):
+        return self.__phone
 
-    # @phone.setter
-    # def phone(self, phone):
-    #     if phone[0].startswith("+"):
-    #         self.__phone = phone
-    #     else:
-    #         return ("Number must be started from '+'")
+    @phone.setter
+    def phone(self, phone):
+        if phone.startswith("+") and len(phone) == 13:
+            self.__phone = phone
+        else:
+            print("Number must be started from '+' and must have 12 digits")
+
+    @property
+    def birthday(self):
+        return self.__birthday
+
+    @birthday.setter
+    def birthday(self, birthday):
+        birthday = birthday.split(".")
+        if int(birthday[0]) > (datetime.now().year - 100) and int(birthday[0]) < (datetime.now().year):
+            self.__birthday = birthday
+        else:
+            print("Human can`t live that long or be born in the future -__-")
 
 
 class Name:
@@ -50,18 +63,13 @@ class Name:
 
 
 class Phone(Field):
-    # def __init__(self, value):
-    #     super().__init__(value)
     def __init__(self, value):
-        self.value = value
+        super().__init__(phone=value)
 
 
 class Birthday(Field):
     def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return self.value
+        super().__init__(birthday=value)
 
 
 class Record:
@@ -69,7 +77,8 @@ class Record:
     def __init__(self, name, phone=None, birthday=""):
         self.name = name
         self.phone = phone
-        self.birthday = str(birthday)
+        if birthday:
+            self.birthday = birthday.birthday
 
     def add_change(self):
         if self.birthday:
@@ -81,7 +90,6 @@ class Record:
         return []
 
     def days_to_birthday(self):
-        self.birthday = self.birthday.split(".")
         self.birthday = datetime(int(self.birthday[0]), int(
             self.birthday[1]), int(self.birthday[2]))
         date_now = datetime.now().date()
@@ -96,10 +104,10 @@ class Record:
 
 
 number_dict = AddressBook({
-    "Andrii": "380671125330",
-    "Oksana": "380675069283",
-    "Oleksandr": "380677384098",
-    "Valeriya": "380934267600"
+    "Andrii": "+380671125330",
+    "Oksana": "+380675069283",
+    "Oleksandr": "+380677384098",
+    "Valeriya": "+380934267600"
 })
 
 CYCLE = True
@@ -116,7 +124,7 @@ def input_error(func):
                 if list_user_input[1].isalpha() and len(list_user_input) >= 2:
                     date_check = list_user_input[-1].split(".")
                     if len(list_user_input[-1]) == 10 and len(date_check) == 3:
-                        if int(date_check[0]) < datetime.now().year and 0 < int(date_check[1]) <= 12 and int(date_check[2]) > 0:
+                        if 0 < int(date_check[1]) <= 12 and int(date_check[2]) > 0:
                             birthday = list_user_input[-1]
                         else:
                             raise KeyError
@@ -126,7 +134,7 @@ def input_error(func):
                 else:
                     raise KeyError
             except:
-                return "Give me first - name, then give another info please. In the end, if you want, give me date of birthday, like 'yyyy.mm.dd'!"
+                return "Give me first - name, then - number phones. In the end, if you want, give me date of birthday, like 'yyyy.mm.dd'!"
 
         elif list_user_input[0] == "phone":
             try:
@@ -175,15 +183,19 @@ def add_change(birthday):
     if len(list_user_input) != 2:
         for phone in list_user_input[2:-1]:
             phone = Phone(phone)
-            phones.append(phone.value)
+            if phone.phone:
+                phones.append(phone.phone)
 
         if not birthday:
-            phones.append(list_user_input[-1])
-    else:
-        pass
+            phone = Phone(list_user_input[-1])
+            if phone.phone:
+                phones.append(phone.phone)
+        else:
+            birthday = Birthday(birthday)
 
-    record = Record(Name(list_user_input[1]), phones, Birthday(birthday))
-    number_dict.add_record(record.name.value, record.add_change())
+    if phone.phone and birthday.birthday:
+        record = Record(Name(list_user_input[1]), phones, birthday)
+        number_dict.add_record(record.name.value, record.add_change())
 
 
 @input_error
@@ -195,23 +207,23 @@ def phone():
 @input_error
 def show_all():
     global number_dict
+    number_dict = AddressBook(number_dict.data)
     res_show_all = ("")
     for k, v in number_dict:
         res_show_all += f"{k}: {v}\n"
     res_show_all = res_show_all.strip()
-    number_dict = AddressBook(number_dict.data)
     return res_show_all
 
 
 @input_error  # За допомогою цієї команди виводимо стільки контактів скільки хочемо. Треба писати, як приклад "show 3", тоді виведе перші 3 контакти
 def show():
     global number_dict
+    number_dict = AddressBook(number_dict.data)
     res_show_all = ("")
     for _ in range(int(list_user_input[1])):
         x = next(number_dict)
         res_show_all += f"{str(x)}\n"
     res_show_all = res_show_all.strip()
-    number_dict = AddressBook(number_dict.data)
     return res_show_all
 
 
