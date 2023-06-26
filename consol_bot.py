@@ -1,5 +1,6 @@
 from collections import UserDict
 from datetime import datetime
+import json
 
 
 class AddressBook(UserDict):
@@ -79,6 +80,8 @@ class Record:
         self.phone = phone
         if birthday:
             self.birthday = birthday.birthday
+        else:
+            self.birthday = ""
 
     def add_change(self):
         if self.birthday:
@@ -193,8 +196,11 @@ def add_change(birthday):
         else:
             birthday = Birthday(birthday)
 
-    if phone.phone and birthday.birthday:
+    if phone and birthday:
         record = Record(Name(list_user_input[1]), phones, birthday)
+        number_dict.add_record(record.name.value, record.add_change())
+    elif phone:
+        record = Record(Name(list_user_input[1]), phones)
         number_dict.add_record(record.name.value, record.add_change())
 
 
