@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import datetime
-import json
+import pickle
 
 
 class AddressBook(UserDict):
@@ -107,11 +107,13 @@ class Record:
 
 
 number_dict = AddressBook({
-    "Andrii": "+380671125330",
-    "Oksana": "+380675069283",
-    "Oleksandr": "+380677384098",
-    "Valeriya": "+380934267600"
+    "Name": "+380000000000"
 })
+
+
+with open("number_dict.bin", "rb") as f:
+    number_dict = pickle.load(f)
+
 
 CYCLE = True
 
@@ -299,3 +301,6 @@ def main():
 if __name__ == "__main__":
     while CYCLE:
         main()
+
+        with open("number_dict.bin", "wb") as f:
+            pickle.dump(number_dict, f)
