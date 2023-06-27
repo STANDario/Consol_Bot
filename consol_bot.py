@@ -171,6 +171,22 @@ def input_error(func):
         elif list_user_input[0] == "show all":
             return func()
 
+        elif list_user_input[0] == "search":
+            try:
+                if list_user_input[1]:
+                    for name, phone in number_dict.data.items():
+                        if list_user_input[1] in name:
+                            return func()
+                        for i in phone:
+                            if list_user_input[1] in i:
+                                return func()
+                    else:
+                        raise KeyError
+                else:
+                    raise KeyError
+            except:
+                return "You don`t have contacts with these letters or numbers in your Address Book"
+
         else:
             return func()
 
@@ -211,6 +227,26 @@ def add_change(birthday):
 def phone():
     name = list_user_input[1]
     return number_dict.get(name)
+
+
+@input_error    # За допомогою цієї команди ми можемо по символам знаходити контакти, у яких присутні такі символи, виведе їх список
+def search():
+    name_or_phone = list_user_input[1]
+    result_dict = {}
+    result_str = ""
+
+    for name, phone in number_dict.data.items():
+        if name_or_phone in name:
+            result_dict[name] = phone
+        for i in phone:
+            if name_or_phone in i:
+                result_dict[name] = phone
+
+    for k, v in result_dict.items():
+        result_str += f"{k}: {v}\n"
+    result_str = result_str.strip()
+
+    return result_str
 
 
 @input_error
@@ -256,6 +292,7 @@ operations = {
     "add": add_change,
     "change": add_change,
     "phone": phone,
+    "search": search,
     "show all": show_all,
     "show": show,
     "good bye": exit,
