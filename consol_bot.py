@@ -106,13 +106,14 @@ class Record:
             return f"days to birthday: {((self.birthday.replace(year=date_now.year+1)).date() - date_now).days}"
 
 
-number_dict = AddressBook({
-    "Name": "+380000000000"
-})
+number_dict = AddressBook({})
 
-
-with open("number_dict.bin", "rb") as f:
-    number_dict = pickle.load(f)
+try:
+    with open("number_dict.bin", "rb") as f:
+        number_dict = pickle.load(f)
+except FileNotFoundError:
+    with open("number_dict.bin", "wb") as f:
+        pickle.dump(number_dict, f)
 
 
 CYCLE = True
